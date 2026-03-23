@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { calculateTime } from "@/utils/CalculateTime";
 import MessageStatus from "../common/MessageStatus";
 import { FaCamera, FaMicrophone } from "react-icons/fa";
+import { MdInsertDriveFile, MdLocationOn } from "react-icons/md";
 import { GET_INITIAL_CONTACT_ROUTE } from "@/utils/ApiRoutes";
 
 function ChatLIstItem({ socket, data, isContactpage = false,lastMessage=false, unreadMessageCount=0 }) {
@@ -25,6 +26,28 @@ function ChatLIstItem({ socket, data, isContactpage = false,lastMessage=false, u
     }
   }
 
+  const getLastMessagePreview = () => {
+    if (!lastMessage) return "";
+
+    const prefix = lastMessage?.senderId === UserInfo?.id ? "You: " : "";
+
+    switch (lastMessage?.type) {
+      case "text":
+        return prefix + lastMessage?.message;
+      case "image":
+        return prefix + "📷 Image";
+      case "audio":
+        return prefix + "🎤 Audio";
+      case "document":
+        const docName = lastMessage?.message?.split("/").pop()?.split(".")[0] || "Document";
+        return prefix + `📄 ${docName}`;
+      case "location":
+        return prefix + "📍 Location";
+      default:
+        return prefix + lastMessage?.message || "";
+    }
+  };
+
   return <div className={`flex cursor-pointer items-center pr-2 hover:bg-background-default-hover`} onClick={HandleContactClick} >
     <div className="min-w-fit px-5 pt-3 pb-1">
       <Avatar type="lg" image={data.profileImage}  />
@@ -35,7 +58,7 @@ function ChatLIstItem({ socket, data, isContactpage = false,lastMessage=false, u
           <span className="text-white">{data?.name}</span>
         </div>
         {
-          !isContactpage && (
+          !isContactpage && lastMessage && (
             <div>
               <span className={`${unreadMessageCount>0 ? "text-icon-green" : "text-secondary"} text-sm`} >
                 {calculateTime(lastMessage?.createdAt)}
@@ -51,17 +74,9 @@ function ChatLIstItem({ socket, data, isContactpage = false,lastMessage=false, u
             {isContactpage ? data?.about || "\u00A0":
             <div className="flex items-center gap-1 max-w-[200px] sm:max-w-[250px] md:max-w-[300px] lg:max-w-[200px] xl:max-w-[300px]">
               {
-                lastMessage?.senderId === UserInfo?.id? <MessageStatus messageStatus={lastMessage?.messageStatus}/>:""
+                lastMessage?.senderId === UserInfo?.id ? <MessageStatus messageStatus={lastMessage?.messageStatus}/>:""
               }
-              {
-                lastMessage?.type === "text" ? <span className="truncate">{lastMessage?.message}</span>:""
-              }
-              {
-                lastMessage?.type === "image" ? <span className="flex gap-1 items-center"><FaCamera/>Image</span>:""
-              }
-              {
-                lastMessage?.type === "audio" ? <span className="flex gap-1 items-center"><FaMicrophone className="text-panel-header-icon" />Audio</span>:""
-              }
+              <span className="truncate">{getLastMessagePreview()}</span>
               </div>}
             </span>
             {

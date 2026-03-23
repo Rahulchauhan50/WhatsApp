@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { calculateTime } from "@/utils/CalculateTime";
 import { useSelector } from "react-redux";
 import Image from "next/image";
 import { GET_IMAGE_ROUTE, HOST } from "@/utils/ApiRoutes";
@@ -10,6 +9,12 @@ import { FaCamera } from "react-icons/fa";
 function ImageMessage({ message }) {
   const { CurrentChatUser } = useSelector((state) => state.user);
   const { UserInfo } = useSelector((state) => state.user);
+
+  const getTime = (date) => {
+    const dateObject = new Date(date);
+    const options = { hour: 'numeric', minute: 'numeric', hour12: true };
+    return dateObject.toLocaleString('en-US', options);
+  };
 
   return (
     <div className={`p-1 rounded-lg ${
@@ -28,7 +33,7 @@ function ImageMessage({ message }) {
         />
         <div className="absolute bottom-1 right-1 flex items-end gap-1">
           <span className="text-bubble-meta text-[11px] pt-1 min-w-fit">
-          {calculateTime(message.createdAt)}
+          {getTime(message.createdAt)}
           </span>
           <span className="text-bubble-meta">
             {

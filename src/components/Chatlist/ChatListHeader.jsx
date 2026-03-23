@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Avatar from "../common/Avatar";
 import { BsFillChatLeftTextFill, BsThreeDotsVertical} from 'react-icons/bs'
 import { useDispatch } from "react-redux";
-import { setConstactPage,setUserInfo } from '@/redux/features/userSlice';
+import { setConstactPage, setUserInfo, setProfilePage } from '@/redux/features/userSlice';
 import { useSelector } from "react-redux";
 import ContextMenu from "../common/ContextMenu";
 import { useRouter } from "next/router";
@@ -45,7 +45,7 @@ function ChatListHeader({socket}) {
 
 
   return <div className="h-16 px-4 py-3 flex justify-between items-center">
-    <div  className="cursor-pointer">
+    <div onClick={() => dispatch(setProfilePage(true))} className="cursor-pointer">
       {
         IsfetchingUser? <div className="animate-pulse flex space-x-4">
 

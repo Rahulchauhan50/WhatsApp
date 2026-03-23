@@ -26,6 +26,16 @@ const initialState = {
   incomingVoiceCall:undefined,
   Read:false,
   IsfetchingUser:true,
+  ProfilePage:false,
+  ContactInfo:false,
+  activeTab:"chats",
+  pagination: {
+    skip: 0,
+    limit: 50,
+    hasMore: true,
+    total: 0,
+  },
+  isLoadingOlderMessages: false,
 };
 
 const UserSlice = createSlice({
@@ -77,6 +87,12 @@ const UserSlice = createSlice({
     },
     setMessages:(state, action) => {
       state.Messages = action.payload.data.message;
+      state.pagination = action.payload.data.pagination || {
+        skip: 0,
+        limit: 50,
+        hasMore: true,
+        total: 0,
+      };
     },
     setSocket:(state, action) => {
       state.socket = action.payload;
@@ -138,68 +154,74 @@ const UserSlice = createSlice({
       state.incomingVoiceCall=undefined
     },
     setRead:(state, action) => {
-      state.Read = action.payload;
-      var rrr = JSON.parse(JSON.stringify(state.Messages))
-     var arr = {};
-     Object.entries(rrr).map(([date, messageList])=>{
-      messageList.map((msg)=>{
-        if(msg.messageStatus !== "read"){
-          if(arr[date]){
-            arr[date].push({
-              createdAt:msg.createdAt,
-              id:msg.id,message:msg.message,
-              messageStatus:"read",
-              recieverId:msg.recieverId,
-              senderId:msg.senderId,
-              type:msg.type
-          });
-          }else{
-            arr[date] = [{
-              createdAt:msg.createdAt,
-              id:msg.id,message:msg.message,
-              messageStatus:"read",
-              recieverId:msg.recieverId,
-              senderId:msg.senderId,
-              type:msg.type
-          }]
-          }
-         
-        }
-        if(arr[date]){
-          arr[date].push({
-            createdAt:msg.createdAt,
-            id:msg.id,message:msg.message,
-            messageStatus:"read",
-            recieverId:msg.recieverId,
-            senderId:msg.senderId,
-            type:msg.type
-        });
-        }else{
-          arr[date] = [{
-            createdAt:msg.createdAt,
-            id:msg.id,message:msg.message,
-            messageStatus:"read",
-            recieverId:msg.recieverId,
-            senderId:msg.senderId,
-            type:msg.type
-        }]
-
-        }
-
-      })
-     })
-
-    state.Messages = arr;
+      if(!state.Messages) return;
+      
+      // action.payload contains { readBy: userId } - the user who marked messages as read
+      const readByUserId = action.payload?.readBy;
+      
+      const updatedMessages = {};
+      Object.entries(state.Messages).forEach(([date, messageList]) => {
+        updatedMessages[date] = messageList.map((msg) => ({
+          ...msg,
+          // Mark as read if: messages we sent (senderId === our id) AND received by the person who just opened chat
+          messageStatus: (msg.senderId === state.UserInfo.id && msg.recieverId === readByUserId && msg.messageStatus !== "read") 
+            ? "read" 
+            : msg.messageStatus
+        }));
+      });
+      state.Messages = updatedMessages;
     },
     setIsfetchingUser:(state, action) => {
       state.IsfetchingUser = action.payload;
-    }
+    },
+    setLoadingOlderMessages:(state, action) => {
+      state.isLoadingOlderMessages = action.payload;
+    },
+    setProfilePage:(state, action) => {
+      state.ProfilePage = action.payload;
+    },
+    setContactInfo:(state, action) => {
+      state.ContactInfo = action.payload;
+    },
+    setActiveTab:(state, action) => {
+      state.activeTab = action.payload;
+    },
+    addOlderMessages:(state, action) => {
+      if(!state.Messages) return;
+      
+      const olderMessages = action.payload.data.message;
+      const pagination = action.payload.data.pagination;
+      
+      // Merge older messages at the beginning
+      const updatedMessages = {};
+      
+      // First add the older messages
+      Object.entries(olderMessages).forEach(([date, messageList]) => {
+        if(updatedMessages[date]){
+          updatedMessages[date] = [...messageList, ...updatedMessages[date]];
+        } else {
+          updatedMessages[date] = messageList;
+        }
+      });
+      
+      // Then add the existing messages
+      Object.entries(state.Messages).forEach(([date, messageList]) => {
+        if(updatedMessages[date]){
+          updatedMessages[date] = [...updatedMessages[date], ...messageList];
+        } else {
+          updatedMessages[date] = messageList;
+        }
+      });
+      
+      state.Messages = updatedMessages;
+      state.pagination = pagination || state.pagination;
+    },
   },
 });
 
 
 
-export const {setUserInfo, setConstactPage, setCurrentChatUser, setMessages, setSocket, setAddMessages, setMessageSearch, setUserContacts, setOnlineUser, setfilteredContacts, setVideoCall, setVoiceCall, setIncomingVideoCall, setIncomingVoiceCall, EndCall, setRead, setIsfetchingUser} = UserSlice.actions;
+export const {setUserInfo, setConstactPage, setCurrentChatUser, setMessages, setSocket, setAddMessages, setMessageSearch, setUserContacts, setOnlineUser, setfilteredContacts, setVideoCall, setVoiceCall, setIncomingVideoCall, setIncomingVoiceCall, EndCall, setRead, setIsfetchingUser, setLoadingOlderMessages, addOlderMessages, setProfilePage, setContactInfo, setActiveTab} = UserSlice.actions;
 
 export default UserSlice.reducer;
 

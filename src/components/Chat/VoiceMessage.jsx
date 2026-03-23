@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 import Avatar from "../common/Avatar";
 import MessageStatus from "../common/MessageStatus";
 import {FaPlay,FaStop} from "react-icons/fa";
-import { calculateTime } from "@/utils/CalculateTime";
 import { HOST } from "@/utils/ApiRoutes";
 
 function VoiceMessage({ message }) {
@@ -46,7 +45,7 @@ function VoiceMessage({ message }) {
   };
 
   useEffect(() => {
-    const audioURL = `${HOST}/${message.message}`;
+    const audioURL = message.message.startsWith("http") ? message.message : `${HOST}/${message.message}`;
   
     const audio = new Audio(audioURL);
     setaudioMessage(audio);
@@ -109,7 +108,7 @@ function VoiceMessage({ message }) {
 
   useEffect(() => {
     console.log(message)
-    const audioURL = `${HOST}/${message.message}`;
+    const audioURL = message.message.startsWith("http") ? message.message : `${HOST}/${message.message}`;
     console.log(audioURL)
     const audio = new Audio(audioURL);
     setaudioMessage(audio);
@@ -118,28 +117,31 @@ function VoiceMessage({ message }) {
     setTotalDuration( WaveForm.current.getDuration());
   }, [message.message]);
 
-  return <div  className={`flex items-center gap-5 text-white px-4 pr-2 py-4 text-sm rounded-md ${
+  const getTime = (date) => {
+    const dateObject = new Date(date);
+    const options = { hour: 'numeric', minute: 'numeric', hour12: true };
+    return dateObject.toLocaleString('en-US', options);
+  };
+
+  return <div  className={`flex items-center gap-3 text-white px-3 pr-2 py-3 text-sm rounded-md w-[300px] max-w-[85vw] ${
     message.senderId === CurrentChatUser.id
       ? "bg-incoming-background"
       : "bg-outgoing-background"
   }`}>
-    <div>
-      <Avatar type='lg' image={CurrentChatUser?.profileImage} />
-    </div>
-    <div className="cursor-pointer text-xl" >
+    <div className="cursor-pointer text-xl shrink-0" >
                 {!IsPlaying ? (
                   <FaPlay onClick={handlePlayAudio} />
                 ) : (
                   <FaStop onClick={handlePauseAudio} />
                 )}
     </div>
-    <div className="relative">
-    <div className="w-60" ref={WaveFormRef} />
-    <div className="text-bubble-meta text-[11px] pt-1 flex justify-between absolute bottom-[-22px] w-full" >
+    <div className="relative flex-1 min-w-0">
+    <div className="w-full" ref={WaveFormRef} />
+    <div className="text-bubble-meta text-[11px] pt-1 flex justify-between w-full" >
       <span>{formatTime(IsPlaying?CurrentPlayBackTime:TotalDuration)}</span>
-      <div className="absolute bottom-1 right-1 flex items-end gap-1">
+      <div className="flex items-end gap-1">
           <span className="text-bubble-meta text-[11px] pt-1 min-w-fit">
-            {calculateTime(message.createdAt)}
+            {getTime(message.createdAt)}
           </span>
           <span className="text-bubble-meta">
             {

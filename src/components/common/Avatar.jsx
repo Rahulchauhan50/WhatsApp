@@ -32,6 +32,7 @@ function Avatar({ type, image, setimage, setprofileImageUpload }) {
     }},
     {name:"Remove Photo",callback:() => {
       dispatch(setUserInfo({profileImageTemp:"/default_avatar.png"}));
+      dispatch(setUserInfo({profileImage:null}));
     }}
   ]
 
@@ -56,19 +57,18 @@ function Avatar({ type, image, setimage, setprofileImageUpload }) {
 
   const photoPickerChange = async (e) => {
     const file = e.target.files[0];
-    setprofileImageUpload(file)
+    if(!file) return;
+    
+    setprofileImageUpload(file);
     const reader = new FileReader();
-    const data = document.createElement('img');
-    reader.onload = function (event){
-      data.src = event.target.result;
-      data.setAttribute("data-src",event.target.result)
+    
+    reader.onload = function (event) {
+      const base64Data = event.target.result;
+      dispatch(setUserInfo({profileImageTemp: base64Data}));
+      dispatch(setUserInfo({profileImage: null}));
     }
-    reader.readAsDataURL(file)
-    setTimeout(()=>{
-      dispatch(setUserInfo({profileImageTemp:data.src}));
-      dispatch(setUserInfo({profileImage:null}));
-    },3000)
-
+    
+    reader.readAsDataURL(file);
   }
   
   return <>
@@ -85,12 +85,19 @@ function Avatar({ type, image, setimage, setprofileImageUpload }) {
       )}
       {type == "xl" && (
         <div className="context-openers relative cursor-pointer z-0" onMouseEnter={()=>setHover(true)} onMouseLeave={()=>setHover(false)}>
-          <div onClick={e=>showContextMenu(e)} className={`z-10 context-openers bg-photopicker-overlay-background h-60 w-60 absolute top-0 left-0 flex items-center rounded-full justify-center flex-col text-center gap-2 ${Hover?"visible":"hidden"}`}>
+          <div onClick={e=>showContextMenu(e)} className={`z-10 context-openers bg-photopicker-overlay-background h-60 w-60 absolute top-0 left-0 flex items-center rounded-full justify-center flex-col text-center gap-2 ${Hover?"visible opacity-100":"hidden opacity-0"} transition-opacity duration-200`}>
             <FaCamera className="text-2xl"/>
-            <span className="context-openers">Change profile photo</span>
+            <span className="context-openers text-sm">Change profile photo</span>
           </div>
-        <div onClick={e=>showContextMenu(e)} className="context-openers flex items-center h-60 w-60">
-          <Image src={UserInfo?.profileImageTemp} className="context-openers rounded-full bg-[#233138]" alt="avatar" height={250} width={250}/>
+        <div onClick={e=>showContextMenu(e)} className="context-openers flex items-center h-60 w-60 rounded-full overflow-hidden hover:shadow-xl transition-shadow duration-200">
+          <Image 
+            src={UserInfo?.profileImageTemp || "/default_avatar.png"} 
+            className="context-openers rounded-full bg-[#233138] object-cover" 
+            alt="avatar" 
+            height={250} 
+            width={250}
+            priority={true}
+          />
         </div>
         </div>
       )}

@@ -1,15 +1,18 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth"
 
+
+
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-    apiKey: "AIzaSyAyE0IPmqUFWkeyiga4K9QpcGngzAfwow0",
-    authDomain: "whatsapp-6d9f0.firebaseapp.com",
-    projectId: "whatsapp-6d9f0",
-    storageBucket: "whatsapp-6d9f0.appspot.com",
-    messagingSenderId: "960797200662",
-    appId: "1:960797200662:web:e2935bf9b5ef8d3dc9c037",
-    measurementId: "G-J35K8EXHX1"
-  };
+  apiKey: "AIzaSyBshvb4fAg5IvC04M6EAlTF47r_PH6XPoo",
+  authDomain: "spotify-9138a.firebaseapp.com",
+  projectId: "spotify-9138a",
+  storageBucket: "spotify-9138a.firebasestorage.app",
+  messagingSenderId: "571867034037",
+  appId: "1:571867034037:web:27c78f304717c29b8269fc",
+  measurementId: "G-G67F7V7MXZ"
+};
 
   const app = initializeApp(firebaseConfig);
   export const firebaseAuth = getAuth(app)

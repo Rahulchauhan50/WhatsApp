@@ -27,7 +27,7 @@ function index() {
             router.push('/login')
           }
           else if(data.status){
-            dispatch(setUserInfo({name:data.data.name,email:data.data.email,profileImage:data.data.profileImage, status:"available",NewUser:false,id:data.data.id}));
+            dispatch(setUserInfo({name:data.data.name,email:data.data.email,profileImage:data.data.profileImage, about:data.data.about, status:"available",NewUser:false,id:data.data.id}));
             dispatch(setIsfetchingUser(false));
           }
         } catch (error) {

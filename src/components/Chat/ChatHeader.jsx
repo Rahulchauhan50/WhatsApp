@@ -6,7 +6,7 @@ import {BiSearchAlt2} from "react-icons/bi"
 import {BsThreeDotsVertical} from 'react-icons/bs'
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
-import { setVoiceCall, setVideoCall, setCurrentChatUser, setRead } from '@/redux/features/userSlice';
+import { setVoiceCall, setVideoCall, setCurrentChatUser, setContactInfo } from '@/redux/features/userSlice';
 import { setMessageSearch } from "@/redux/features/userSlice";
 import { BsArrowLeftShort } from "react-icons/bs"
 import ContextMenu from "../common/ContextMenu";
@@ -21,7 +21,7 @@ function ChatHeader({socket}) {
   const [IsContextMenuVisible, setIsContextMenuVisible] = useState(false)
 
   const contextMenuOptions = [
-    {name:"view contact",callback:{}},
+    {name:"view contact",callback:() => dispatch(setContactInfo(true))},
     {name:"Media, links, and docs",callback:{}},
     {name:"Search",callback:{}},
     {name:"Mute notifications",callback:{}},
@@ -60,15 +60,16 @@ function ChatHeader({socket}) {
   const handleBack = () => {
     dispatch(setCurrentChatUser({data:undefined}))
     socket.current.emit("send-msg-read", {to:undefined , by:UserInfo.id})
-    dispatch(setRead(false))
   }
 
   
   return <div className="h-16 px-4 py-3 flex justify-between items-center bg-panel-header-background z-10 " >
     <div className="flex items-center justify-center gap-2" >
     <BsArrowLeftShort className="lg:hidden" color="white" size={30} onClick={handleBack} />
-      <Avatar type='sm' image={CurrentChatUser?.profileImage} />
-      <div className="flex flex-col">
+      <div className="cursor-pointer" onClick={() => dispatch(setContactInfo(true))}>
+        <Avatar type='sm' image={CurrentChatUser?.profileImage} />
+      </div>
+      <div className="flex flex-col cursor-pointer" onClick={() => dispatch(setContactInfo(true))}>
         <span className="text-primary-strong text-sm" >{CurrentChatUser?.name}</span>
         <span className={`${typing?"text-green-500":"text-secondary"} text-sm`} >
         {OnlineUser.includes(CurrentChatUser.id) && typing && "typing..."}
