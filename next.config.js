@@ -6,7 +6,7 @@ const nextConfig = {
     NEXT_PUBLIC_ZEGO_SERVER_ID:"b53e2b1c2246bbb3626d71b9bc55fdb8"
   },
   images: {
-    domains: ['lh3.googleusercontent.com','localhost','whatsapp-p2yq.onrender.com','web.whatsapp.com','wapi.rahulcodes.tech'],
+    domains: process.env.IMAGE_DOMAINS ? process.env.IMAGE_DOMAINS.split(',') : [],
   },
 };
 
