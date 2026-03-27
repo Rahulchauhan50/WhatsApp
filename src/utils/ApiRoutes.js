@@ -9,6 +9,8 @@ export const ONBOARD_USER_ROUTE = `${AUTH_ROUTE}/onboard-user`
 export const GET_ALL_CONTACTS    = `${AUTH_ROUTE}/get-contacts`
 export const UPDATE_PROFILE_ROUTE = `${AUTH_ROUTE}/update-profile`
 
+export const IMPORT_GOOGLE_CONTACTS_ROUTE = `${AUTH_ROUTE}/import-google-contacts`
+export const GET_GOOGLE_CONTACTS_ROUTE = `${AUTH_ROUTE}/get-google-contacts`
 export const GET_CALL_TOKEN = `${AUTH_ROUTE}/generate-token`
 
 
@@ -19,3 +21,5 @@ export const ADD_AUDIO_MESSAGE_ROUTE = `${MESSAGES_ROUTE}/add-audio-message`
 export const ADD_DOCUMENT_MESSAGE_ROUTE = `${MESSAGES_ROUTE}/add-document-message`
 export const GET_INITIAL_CONTACT_ROUTE = `${MESSAGES_ROUTE}/get-intial-contacts`
 export const GET_IMAGE_ROUTE = `${MESSAGES_ROUTE}/get-image`
+export const ADD_CALL_MESSAGE_ROUTE = `${MESSAGES_ROUTE}/add-call-message`
+export const GET_CALL_LOGS_ROUTE = `${MESSAGES_ROUTE}/get-call-logs`

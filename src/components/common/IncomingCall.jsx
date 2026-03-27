@@ -1,12 +1,14 @@
-import { EndCall, setIncomingVoiceCall, setVoiceCall } from "@/redux/features/userSlice";
+import { EndCall, setIncomingVoiceCall, setVoiceCall, setAddMessages } from "@/redux/features/userSlice";
 import Image from "next/image";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { MdCall, MdCallEnd } from "react-icons/md";
 import { IoChevronUp } from "react-icons/io5";
+import axios from "axios";
+import { ADD_CALL_MESSAGE_ROUTE } from "@/utils/ApiRoutes";
 
 function IncomingCall({ socket }) {
-  const { incomingVoiceCall } = useSelector((state) => state.user);
+  const { incomingVoiceCall, UserInfo } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   const acceptCall = () => {
@@ -15,7 +17,44 @@ function IncomingCall({ socket }) {
     dispatch(setIncomingVoiceCall({ incomingVoiceCall: undefined }));
   };
 
-  const rejectCall = () => {
+  const rejectCall = async () => {
+    try {
+      const { data: response } = await axios.post(ADD_CALL_MESSAGE_ROUTE, {
+        from: incomingVoiceCall.id,
+        to: UserInfo.id,
+        callType: "voice",
+        duration: 0,
+        status: "rejected",
+      });
+      
+      const callMsg = response.message;
+      
+      // Immediately add message to receiver's chat
+      dispatch(
+        setAddMessages({
+          id: callMsg.id,
+          message: callMsg.message,
+          senderId: callMsg.senderId,
+          recieverId: callMsg.recieverId,
+          type: "call",
+          createdAt: callMsg.createdAt,
+          messageStatus: "read",
+        })
+      );
+      
+      // Emit socket event to notify the caller with full message data
+      socket.current.emit("send-msg", {
+        id: callMsg.id,
+        message: callMsg.message,
+        senderId: callMsg.senderId,
+        recieverId: callMsg.recieverId,
+        type: "call",
+        createdAt: callMsg.createdAt,
+        messageStatus: "read",
+      });
+    } catch (err) {
+      console.error("Failed to save rejected call:", err);
+    }
     dispatch(EndCall());
     socket.current.emit("reject-voice-call", { from: incomingVoiceCall.id });
   };

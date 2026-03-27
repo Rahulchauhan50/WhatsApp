@@ -5,6 +5,7 @@ import MessageStatus from "../common/MessageStatus";
 import ImageMessage from "./ImageMessage";
 import DocumentMessage from "./DocumentMessage";
 import LocationMessage from "./LocationMessage";
+import CallMessage from "./CallMessage";
 import dynamic from "next/dynamic";
 import { setMessages, setRead, addOlderMessages, setLoadingOlderMessages } from "@/redux/features/userSlice";
 import axios from "axios";
@@ -132,6 +133,7 @@ function ChatContainer({socket}) {
                 {msg.type === "audio" && <VoiceMessage message={msg} />}
                 {msg.type === "document" && <DocumentMessage message={{ ...msg, currentUserId: UserInfo.id }} />}
                 {msg.type === "location" && <LocationMessage message={{ ...msg, currentUserId: UserInfo.id }} />}
+                {msg.type === "call" && <CallMessage message={msg} />}
               </div>
             ))}
                   </div>

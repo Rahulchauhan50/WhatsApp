@@ -21,7 +21,6 @@ function VoiceMessage({ message }) {
 
   const handlePlayAudio = () => {
     if (audioMessage) {
-      console.log(audioMessage)
       WaveForm.current.stop();
       WaveForm.current.play();
       audioMessage.play();
@@ -44,8 +43,21 @@ function VoiceMessage({ message }) {
       .padStart(2, "0")}`;
   };
 
+  const getAudioURL = (msg) => {
+    if (msg.startsWith("http")) {
+      // Rewrite absolute URL to use current HOST (avoids CORS with mismatched origins)
+      try {
+        const url = new URL(msg);
+        return `${HOST}${url.pathname}`;
+      } catch {
+        return msg;
+      }
+    }
+    return `${HOST}/${msg}`;
+  };
+
   useEffect(() => {
-    const audioURL = message.message.startsWith("http") ? message.message : `${HOST}/${message.message}`;
+    const audioURL = getAudioURL(message.message);
   
     const audio = new Audio(audioURL);
     setaudioMessage(audio);
@@ -107,9 +119,7 @@ function VoiceMessage({ message }) {
   }, []);
 
   useEffect(() => {
-    console.log(message)
-    const audioURL = message.message.startsWith("http") ? message.message : `${HOST}/${message.message}`;
-    console.log(audioURL)
+    const audioURL = getAudioURL(message.message);
     const audio = new Audio(audioURL);
     setaudioMessage(audio);
     WaveForm.current.load(audioURL);

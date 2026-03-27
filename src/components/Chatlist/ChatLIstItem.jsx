@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import { calculateTime } from "@/utils/CalculateTime";
 import MessageStatus from "../common/MessageStatus";
 import { FaCamera, FaMicrophone } from "react-icons/fa";
-import { MdInsertDriveFile, MdLocationOn } from "react-icons/md";
+import { MdInsertDriveFile, MdLocationOn, MdCall, MdVideocam, MdCallMissed } from "react-icons/md";
 import { GET_INITIAL_CONTACT_ROUTE } from "@/utils/ApiRoutes";
 
 function ChatLIstItem({ socket, data, isContactpage = false,lastMessage=false, unreadMessageCount=0 }) {
@@ -43,6 +43,32 @@ function ChatLIstItem({ socket, data, isContactpage = false,lastMessage=false, u
         return prefix + `📄 ${docName}`;
       case "location":
         return prefix + "📍 Location";
+      case "call":
+        try {
+          const callData = JSON.parse(lastMessage?.message);
+          const isVideo = callData.callType === "video";
+          const isMissed = callData.status === "missed" || callData.status === "rejected";
+          const duration = callData.duration || 0;
+          
+          let callText = isVideo ? "Video call" : "Voice call";
+          if (duration > 0) {
+            const mins = Math.floor(duration / 60);
+            const secs = duration % 60;
+            const durStr = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+            callText += ` · ${durStr}`;
+          } else if (isMissed) {
+            callText += callData.status === "rejected" ? " (Declined)" : " (Missed)";
+          }
+          return {
+            type: "call",
+            text: callText,
+            isVideo: isVideo,
+            isMissed: isMissed,
+            prefix: prefix
+          };
+        } catch {
+          return { type: "call", text: "Call", isVideo: false, isMissed: false, prefix: prefix };
+        }
       default:
         return prefix + lastMessage?.message || "";
     }
@@ -76,7 +102,23 @@ function ChatLIstItem({ socket, data, isContactpage = false,lastMessage=false, u
               {
                 lastMessage?.senderId === UserInfo?.id ? <MessageStatus messageStatus={lastMessage?.messageStatus}/>:""
               }
-              <span className="truncate">{getLastMessagePreview()}</span>
+              {(() => {
+                const preview = getLastMessagePreview();
+                if (typeof preview === 'object' && preview.type === 'call') {
+                  return (
+                    <span className="flex items-center gap-0.5 truncate">
+                      {preview.prefix}
+                      {preview.isVideo ? (
+                        <MdVideocam className={`${preview.isMissed ? "text-red-500" : "text-teal-light"}`} size={16} />
+                      ) : (
+                        <MdCall className={`${preview.isMissed ? "text-red-500" : "text-teal-light"}`} size={16} />
+                      )}
+                      <span className="truncate">{preview.text}</span>
+                    </span>
+                  );
+                }
+                return <span className="truncate">{preview}</span>;
+              })()}
               </div>}
             </span>
             {

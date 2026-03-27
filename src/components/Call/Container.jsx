@@ -1,8 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { EndCall } from "@/redux/features/userSlice";
+import { EndCall, setAddMessages } from "@/redux/features/userSlice";
 import { MdCallEnd, MdMic, MdMicOff } from "react-icons/md";
 import Image from "next/image";
+import axios from "axios";
+import { ADD_CALL_MESSAGE_ROUTE } from "@/utils/ApiRoutes";
 
 const ICE_SERVERS = {
   iceServers: [
@@ -58,7 +60,57 @@ function Container({ socket, data }) {
     }
   }, []);
 
+  const callSaved = useRef(false);
+
+  const saveCallLog = useCallback(async (status) => {
+    if (callSaved.current) return;
+    callSaved.current = true;
+    try {
+      const { data: response } = await axios.post(ADD_CALL_MESSAGE_ROUTE, {
+        from: UserInfo.id,
+        to: data.id,
+        callType: data.callType,
+        duration: callDuration,
+        status,
+      });
+      
+      const callMsg = response.message;
+      
+      // Immediately add message to sender's chat
+      dispatch(
+        setAddMessages({
+          id: callMsg.id,
+          message: callMsg.message,
+          senderId: callMsg.senderId,
+          recieverId: callMsg.recieverId,
+          type: "call",
+          createdAt: callMsg.createdAt,
+          messageStatus: "read",
+        })
+      );
+      
+      // Emit socket event to notify the other user about the call message
+      socket.current.emit("send-msg", {
+        id: callMsg.id,
+        message: callMsg.message,
+        senderId: callMsg.senderId,
+        recieverId: callMsg.recieverId,
+        type: "call",
+        createdAt: callMsg.createdAt,
+        messageStatus: "read",
+      });
+    } catch (err) {
+      console.log("Failed to save call log:", err);
+    }
+  }, [UserInfo.id, data.id, data.callType, callDuration, dispatch]);
+
   const endCall = useCallback(() => {
+    // Determine status: if duration >3s, likely completed; else check connectionState
+    const status = 
+      (callDuration > 3 || connected) 
+        ? "completed" 
+        : (data.type === "out-going" ? "missed" : "rejected");
+    saveCallLog(status);
     cleanup();
     if (data.callType === "voice") {
       socket.current.emit("reject-voice-call", { from: data.id });
@@ -66,7 +118,7 @@ function Container({ socket, data }) {
       socket.current.emit("reject-video-call", { from: data.id });
     }
     dispatch(EndCall());
-  }, [cleanup, data, dispatch, socket]);
+  }, [cleanup, data, dispatch, socket, connected, callDuration, saveCallLog]);
 
   // Create peer connection and set up handlers
   const createPeerConnection = useCallback(() => {
