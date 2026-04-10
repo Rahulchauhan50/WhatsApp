@@ -34,5 +34,11 @@
     "wavesurfer.js": "^6.6.3",
     "zego-express-engine-webrtc": "2.24.5",
     "zego-zim-web": "^2.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^6.0.2"
   }
 }

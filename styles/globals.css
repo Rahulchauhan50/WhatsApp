@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.custom-scrollbar{
+    height: 8px !important;
+    width: 0px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb{
+    background-color: #ffffff3b;
+}
+
+.custom-scrollbar-color::-webkit-scrollbar{
+    /* color: #AEBAC1; */
+    background-color: transparent;
+}
+
+.custom-scrollbar-color::-webkit-scrollbar-thumb{
+    /* background-color: #202C33; */
+    border-radius: 10px;
+    width: 10px;
+}
+
+
+
+.custom-scrollbar-width-0::-webkit-scrollbar{
+    width: 0px;
+    height: 0px;
+}
+
+.chat-container{
+    background-image: url('/chat-bg.png');
+    color: white;
+}
+
+.chat-container::before {
+    background-color: rgba(0, 0, 0, 0.5); /* Set the desired opacity color */
+    z-index: -1;
+    content: '';
+}
+
+.right {
+    position: relative;
+  }
+  
+  .right::before {
+    content: '';
+    position: absolute;
+    visibility: visible;
+    top: 0px;
+    right: -10px;
+    border: 10px solid transparent;
+    border-top: 10px solid #005c4b;
+  }
+  
+  .right::after {
+    content: '';
+    position: absolute;
+    visibility: visible;
+    top: 0px;
+    right: -8px;
+    border: 10px solid transparent;
+    border-top: 10px solid #005c4b;
+    clear: both;
+  }
+
+  .left {
+    position: relative;
+  }
+
+  .left::before {
+    content: '';
+    position: absolute;
+    visibility: visible;
+    top: 0px;
+    left: -10px;
+    border: 10px solid transparent;
+    border-top: 10px solid #202c33;
+  }
+
+  .left::after {
+    content: '';
+    position: absolute;
+    visibility: visible;
+    top: 0px;
+    left: -8px;
+    border: 10px solid transparent;
+    border-top: 10px solid #202c33;
+    clear: both;
+  }
+  
+  
