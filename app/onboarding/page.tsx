@@ -97,7 +97,7 @@ export default function OnboardingPage() {
       <div className="w-full max-w-md px-6 md:px-0">
         <div className="text-center mb-10">
           <h1 className="text-4xl md:text-5xl font-bold mb-3">
-            Create Your Profile
+            Create Your Profile.
           </h1>
           <p className="text-gray-400 text-sm md:text-base">
             Set up your WhatsApp account to get started
