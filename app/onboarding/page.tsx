@@ -93,6 +93,7 @@ export default function OnboardingPage() {
   }, [UserInfo, router]);
 
   return (
+    // Background and container
     <div className="bg-panel-header-background min-h-screen w-screen text-white flex flex-col items-center justify-center py-8 md:py-0">
       <div className="w-full max-w-md px-6 md:px-0">
         <div className="text-center mb-10">
@@ -104,6 +105,7 @@ export default function OnboardingPage() {
           </p>
         </div>
 
+        {/* Profile Image Section */}
         <div className="flex flex-col-reverse md:flex-row gap-8 items-center md:items-start mb-8">
           <div className="flex flex-col gap-6 w-full md:flex-1">
             <div className="flex flex-col gap-2">
@@ -167,6 +169,7 @@ export default function OnboardingPage() {
           </div>
         </div>
 
+{/* Create Profile Button */}
         <button
           onClick={onBoardUserHandler}
           disabled={loading || !UserInfo?.name || !UserInfo?.about}

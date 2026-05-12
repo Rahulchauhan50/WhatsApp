@@ -106,6 +106,7 @@ export default function LoginPage() {
   };
 
   return (
+    // Background and container
     <div className="min-h-[100dvh] flex flex-col bg-[#111b21]">
       <div className="h-[222px] bg-[#00a884] absolute top-0 left-0 right-0 z-0" />
 
