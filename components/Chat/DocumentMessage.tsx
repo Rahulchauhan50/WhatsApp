@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import { MdDownload, MdOpenInNew } from "react-icons/md";
 import MessageStatus from "../common/MessageStatus";
 
-function DocumentMessage({ message }) {
+function DocumentMessage({ message }: { message: any }) {
   const [fileSize, setFileSize] = useState("Unknown size");
 
-  const formatFileSize = (bytes) => {
+  const formatFileSize = (bytes: any) => {
     if (!bytes) return "0 B";
     const k = 1024;
     const sizes = ["B", "KB", "MB", "GB"];
@@ -13,7 +13,7 @@ function DocumentMessage({ message }) {
     return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
   };
 
-  const getFileName = (url) => {
+  const getFileName = (url: any) => {
     const parts = url.split("/");
     return parts[parts.length - 1];
   };
@@ -67,9 +67,9 @@ function DocumentMessage({ message }) {
   const fileName = getFileName(message.message);
   const fileType = fileName.split(".").pop().toUpperCase();
 
-  const getTime = (date) => {
+  const getTime = (date: any) => {
     const dateObject = new Date(date);
-    const options = { hour: 'numeric', minute: 'numeric', hour12: true };
+    const options: Intl.DateTimeFormatOptions = { hour: 'numeric', minute: 'numeric', hour12: true };
     return dateObject.toLocaleString('en-US', options);
   };
 

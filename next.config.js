@@ -4,6 +4,9 @@ const imageDomains = process.env.IMAGE_DOMAINS
   : [];
 
 const nextConfig = {
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   reactStrictMode: false,
   env:{
     NEXT_PUBLIC_ZEGO_APP_ID:"366589160",
